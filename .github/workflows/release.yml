@@ -1,0 +1,136 @@
+name: Build & Release Portable Suite
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-verify:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile Osiris_Indexer_Deleter.exe
+        shell: pwsh
+        run: |
+          & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" `
+            /nologo /target:winexe /optimize+ `
+            /win32icon:"FILES INDEXATION_DELETER\osiris_suite.ico" `
+            /out:"Osiris_Indexer_Deleter.exe" `
+            "src\OsirisLauncher.cs"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & ".\Osiris_Indexer_Deleter.exe" --help
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Download & verify official Python 3.12 embeddable runtime
+        shell: pwsh
+        run: |
+          $url = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
+          $expectedSha = "4acbed6dd1c744b0376e3b1cf57ce906f9dc9e95e68824584c8099a63025a3c3"
+          $dl = "python-embed.zip"
+          Invoke-WebRequest -Uri $url -OutFile $dl -UseBasicParsing
+          $actualSha = (Get-FileHash -Algorithm SHA256 -Path $dl).Hash.ToLower()
+          if ($actualSha -ne $expectedSha) {
+            throw "Embedded Python SHA-256 mismatch: expected $expectedSha, got $actualSha"
+          }
+          Expand-Archive -Path $dl -DestinationPath "_osiris_runtime" -Force
+          Remove-Item -LiteralPath $dl -Force
+
+      - name: Verify embedded runtime, security headers, and build portable ZIP
+        shell: pwsh
+        run: |
+          & ".\_osiris_runtime\python.exe" -m py_compile files_indexer.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          @'
+          import hashlib, re, threading, urllib.request, zipfile
+          from pathlib import Path
+          import files_indexer
+
+          srv = files_indexer.create_server(port=0, host="127.0.0.1")
+          port = srv.server_address[1]
+          threading.Thread(target=srv.serve_forever, daemon=True).start()
+          try:
+              with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=10) as r:
+                  body = r.read()
+                  assert r.status == 200
+                  assert r.headers.get("X-Frame-Options") == "DENY"
+                  assert re.search(rb'name="osiris-token" content="[0-9a-f]{48}"', body)
+          finally:
+              srv.shutdown()
+              srv.server_close()
+
+          entries = [
+              "Osiris_Indexer_Deleter.exe",
+              "FILES_INDEXATION_SYSTEM.html",
+              "files_indexer.py",
+              "OSIRIS_INSTRUCTIONS_README.txt",
+              "FILES INDEXATION_DELETER/CHECKER_DELETER.html",
+              "FILES INDEXATION_DELETER/osiris_suite.ico",
+              "FILES INDEXATION_DELETER/osiris_deleter.ico",
+          ]
+          lite_zip = Path("Osiris_Portable_Indexer_Deleter_Suite_lite.zip")
+          full_zip = Path("Osiris_Portable_Indexer_Deleter_Suite_full.zip")
+
+          with zipfile.ZipFile(lite_zip, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+              for e in entries:
+                  zf.write(e, arcname=e)
+              zf.writestr("files_index_data.js", b"window.FILES_INDEX_DATA = null;\n")
+
+          with zipfile.ZipFile(full_zip, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
+              for e in entries:
+                  zf.write(e, arcname=e)
+              for rt_file in sorted(Path("_osiris_runtime").rglob("*")):
+                  if rt_file.is_file():
+                      zf.write(rt_file, arcname=rt_file.as_posix())
+              zf.writestr("files_index_data.js", b"window.FILES_INDEX_DATA = null;\n")
+
+          for zp in (lite_zip, full_zip):
+              with zipfile.ZipFile(zp, "r") as zf:
+                  assert zf.testzip() is None
+
+          sums = []
+          for p in (lite_zip, full_zip, Path("Osiris_Indexer_Deleter.exe")):
+              h = hashlib.sha256(p.read_bytes()).hexdigest()
+              sums.append(f"{h}  {p.name}")
+          Path("SHA256SUMS.txt").write_text("\n".join(sums) + "\n", encoding="utf-8")
+          print("\n".join(sums))
+          '@ | & ".\_osiris_runtime\python.exe" -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Osiris-Portable-Suite-Windows
+          path: |
+            Osiris_Portable_Indexer_Deleter_Suite_lite.zip
+            Osiris_Portable_Indexer_Deleter_Suite_full.zip
+            Osiris_Indexer_Deleter.exe
+            SHA256SUMS.txt
+
+      - name: Publish GitHub Release on tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          gh release create $tag `
+            Osiris_Portable_Indexer_Deleter_Suite_lite.zip `
+            Osiris_Portable_Indexer_Deleter_Suite_full.zip `
+            Osiris_Indexer_Deleter.exe `
+            SHA256SUMS.txt `
+            --title "Osiris Portable Suite $tag" `
+            --generate-notes

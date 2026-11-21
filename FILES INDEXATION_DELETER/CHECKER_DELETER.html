@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%25%27%20stop-color%3D%27%23fb7185%27%2F%3E%3Cstop%20offset%3D%27100%25%27%20stop-color%3D%27%239f1239%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%271%27%20y%3D%271%27%20width%3D%2722%27%20height%3D%2722%27%20rx%3D%275.5%27%20fill%3D%27url(%23g)%27%2F%3E%3Cpath%20d%3D%27M6.5%208.5h11l-.9%209.2a2%202%200%200%201-2%201.8H9.4a2%202%200%200%201-2-1.8L6.5%208.5Z%27%20fill%3D%27%23fff%27%2F%3E%3Crect%20x%3D%275%27%20y%3D%276.2%27%20width%3D%2714%27%20height%3D%271.8%27%20rx%3D%27.9%27%20fill%3D%27%23fff%27%2F%3E%3Cpath%20d%3D%27M9.6%206.4V5.3a1.3%201.3%200%200%201%201.3-1.3h2.2a1.3%201.3%200%200%201%201.3%201.3v1.1%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%271.5%27%2F%3E%3Cpath%20d%3D%27M10%2011.2l.3%205.3M12%2011.2v5.3M14%2011.2l-.3%205.3%27%20stroke%3D%27%23be123c%27%20stroke-width%3D%271.4%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E">
+<title>OSIRIS FILES CHECKER &amp; DELETER</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-alt: #0b1222;
+    --border: #334155;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #f59e0b;
+    --accent-hover: #d97706;
+    --accent-soft: rgba(245, 158, 11, 0.14);
+    --blue: #3b82f6;
+    --blue-soft: rgba(59, 130, 246, 0.16);
+    --green: #10b981;
+    --green-soft: rgba(16, 185, 129, 0.16);
+    --red: #ef4444;
+    --red-soft: rgba(239, 68, 68, 0.16);
+    --btn-bg: #334155;
+    --btn-hover: #475569;
+  }
+
+  body.light-theme {
+    --bg: #f1f5f9;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #d97706;
+    --accent-hover: #b45309;
+    --accent-soft: rgba(217, 119, 6, 0.12);
+    --blue: #2563eb;
+    --blue-soft: rgba(37, 99, 235, 0.12);
+    --green: #059669;
+    --green-soft: rgba(5, 150, 105, 0.12);
+    --red: #dc2626;
+    --red-soft: rgba(220, 38, 38, 0.12);
+    --btn-bg: #e2e8f0;
+    --btn-hover: #cbd5e1;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 18px;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    overflow-x: hidden;
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  .container {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .svg-ico {
+    width: 1.05em;
+    height: 1.05em;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    vertical-align: -0.15em;
+    flex-shrink: 0;
+  }
+
+  @keyframes icoSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .is-spinning .svg-ico { animation: icoSpin 0.8s linear infinite; }
+
+  .top-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-block h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  .brand-block p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .hdr-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn, select.ctrl-select, input.ctrl-input {
+    font-family: inherit;
+    font-size: 0.86rem;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--btn-bg);
+    color: var(--text);
+    padding: 7px 12px;
+    outline: none;
+  }
+
+  .btn {
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--btn-hover);
+    transform: translateY(-1px);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover:not(:disabled) { background: var(--accent-hover); }
+
+  .btn-blue {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+
+  .btn-green {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+
+  .btn-danger {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+
+  .btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+  }
+
+  .pill.c-shield {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: var(--green-soft);
+    color: var(--green);
+  }
+
+  .pill.server-on {
+    border-color: rgba(59, 130, 246, 0.45);
+    background: var(--blue-soft);
+    color: var(--blue);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .pill.server-on .dot {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .server-scan-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .server-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    flex: 1 1 480px;
+  }
+
+  .server-inputs input.ctrl-input {
+    background: var(--surface-alt);
+    flex: 1 1 220px;
+    min-width: 180px;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background: var(--surface-alt);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-active {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .checkbox-label {
+    font-size: 0.85rem;
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-lbl {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .stat-val {
+    font-size: 1.45rem;
+    font-weight: 800;
+  }
+
+  .stat-card.valid .stat-val { color: var(--green); }
+  .stat-card.fail .stat-val { color: var(--red); }
+  .stat-card.unk .stat-val { color: var(--accent); }
+  .stat-card.quar .stat-val { color: var(--blue); }
+
+  .progress-wrapper { display: none; }
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .progress-track {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.15s linear, background-color 0.25s;
+  }
+  .progress-bar.success { background: var(--green); }
+  .progress-bar.warning { background: var(--accent); }
+  .progress-bar.danger { background: var(--red); }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .search-input {
+    background: var(--surface-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 7px 10px;
+    min-width: 210px;
+    font-family: inherit;
+    font-size: 0.86rem;
+  }
+
+  .table-wrap {
+    width: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 460px;
+    max-height: min(460px, 60dvh);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+  }
+
+  table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 9px 11px;
+    text-align: left;
+    font-size: 0.86rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface-alt);
+    font-weight: 800;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  tbody tr:hover { background: var(--accent-soft); }
+
+  .path-text {
+    display: block;
+    font-size: 0.76rem;
+    font-family: ui-monospace, Consolas, monospace;
+    color: var(--muted);
+    word-break: break-all;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .badge.pass { background: var(--green-soft); color: var(--green); }
+  .badge.fail { background: var(--red-soft); color: var(--red); }
+  .badge.unknown { background: var(--accent-soft); color: var(--accent); }
+  .badge.quarantined { background: var(--blue-soft); color: var(--blue); }
+
+  .quarantine-panel {
+    border: 2px solid var(--accent);
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quarantine-hdr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .quarantine-hdr h2 {
+    margin: 0;
+    font-size: 1.08rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent);
+  }
+
+  .row-actions {
+    display: inline-flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .mini-btn {
+    padding: 4px 8px;
+    font-size: 0.76rem;
+    border-radius: 5px;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2, 6, 23, 0.7);
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  }
+  .modal-card h3 { margin: 0 0 8px; }
+  .modal-card p { margin: 0 0 16px; color: var(--muted); line-height: 1.45; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 250;
+    background: #0f172a;
+    color: #fff;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: all 0.2s ease;
+    max-width: 460px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  #scrollToTopBtn {
+    position: fixed;
+    right: 18px;
+    bottom: 64px;
+    z-index: 90;
+    border-radius: 999px;
+    padding: 8px 14px;
+    opacity: 0;
+    visibility: hidden;
+  }
+  #scrollToTopBtn.show { opacity: 1; visibility: visible; }
+
+  @media (max-width: 768px) {
+    body { padding: 10px; }
+    .server-scan-bar, .toolbar, .quarantine-hdr { align-items: stretch; }
+    .hdr-actions { width: 100%; }
+    .server-inputs { flex: 1 1 100%; }
+    .search-input, .server-inputs input.ctrl-input { width: 100%; min-width: 0; }
+    .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    table { min-width: 580px; }
+  }
+  @media (max-width: 480px) {
+    body { padding: 8px; font-size: 13px; }
+    .top-header, .panel, .quarantine-panel { padding: 11px; }
+    .brand-block h1 { font-size: 1.08rem; }
+    .stat-val { font-size: 1.2rem; }
+    .btn, select.ctrl-select, input.ctrl-input { padding: 6px 9px; font-size: 0.82rem; }
+    .modal-backdrop { padding: 10px; }
+    .modal-card { padding: 16px; }
+    .toast { left: 10px; right: 10px; bottom: 10px; max-width: none; }
+    #scrollToTopBtn { right: 10px; bottom: 14px; padding: 6px 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="top-header">
+    <div class="brand-block">
+      <h1>
+        <svg class="svg-ico" style="color:#f43f5e;width:1.25em;height:1.25em;" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5h14l-1.15 11.8A2.5 2.5 0 0 1 15.36 21.5H8.64a2.5 2.5 0 0 1-2.49-2.2L5 7.5Z" fill="currentColor" fill-opacity="0.22"/><path d="M3.5 6.5h17" stroke-width="2.1"/><path d="M9 6.5V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8v1.7"/><path d="M10.1 11.2l.35 5.6"/><path d="M13.9 11.2l-.35 5.6"/></svg>
+        <span data-i18n="title">OSIRIS FILES CHECKER &amp; DELETER</span>
+      </h1>
+      <p data-i18n="sub">Thorough Multi-Format File Integrity Auditor &amp; Quarantine Deleter (Excludes C:\)</p>
+    </div>
+    <div class="hdr-actions">
+      <span class="pill" id="serverBadge">
+        <span class="dot"></span>
+        <span id="serverBadgeText">OFFLINE</span>
+      </span>
+      <span class="pill c-shield" id="cShieldBadge" title="System drive C:\ is strictly excluded from all Deleter operations">
+        <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+        <span data-i18n="cProtected">C:\ EXCLUDED</span>
+      </span>
+      <button class="btn" id="btnBackIndexer">
+        <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <span data-i18n="backIndexer">Indexer</span>
+      </button>
+      <button class="btn btn-blue" id="btnInstallSuite" title="Create Desktop &amp; Start Menu shortcuts pointing to this portable suite">
+        <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="installBtn">Install Shortcuts</span>
+      </button>
+      <button class="btn" id="btnLangToggle" title="Switch Language (FR / DE / EN)">
+        <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        <span id="btnLangToggleLabel">EN</span>
+      </button>
+      <button class="btn" id="themeToggle" title="Toggle Light / Dark theme">
+        <span id="themeIcon"></span>
+        <span id="themeLabel">DARK</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="server-scan-bar">
+      <div class="server-inputs">
+        <label for="driveSelect" style="font-weight:700;" data-i18n="targetDrive">Target Drive / Folder (Non-C:\):</label>
+        <select class="ctrl-select" id="driveSelect"></select>
+        <input type="text" class="ctrl-input" id="rootInput" placeholder="D:\ or D:\FolderToVerify" spellcheck="false">
+        <button class="btn btn-accent" id="btnServerScan">
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span data-i18n="scanServerBtn">Deep Backend Scan</span>
+        </button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" id="folderBtn">
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+          <span data-i18n="folderBtn">Browse Folder</span>
+        </button>
+        <button class="btn" id="btnPickFiles">
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+          <span data-i18n="pickFilesBtn">Pick Files</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="dropZone" style="margin-top:12px;">
+      <div style="font-weight:700;font-size:1.02rem;" data-i18n="drop">Click or drag &amp; drop files or folders here to verify integrity</div>
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="subfolderCheck" checked>
+          <span data-i18n="subCheck">Include Subfolders</span>
+        </label>
+        <label class="checkbox-label" title="Full container CRC/atom walk, EOF check, JSON/XML parse &amp; browser image/audio/video decode">
+          <input type="checkbox" id="doubleCheck" checked>
+          <span data-i18n="doubleCheck">Deep Check (Full Container CRC &amp; Media Decode)</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="emptyFolderCheck">
+          <span data-i18n="emptyFolderCheck">Remove Empty Folders on Quarantine</span>
+        </label>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);max-width:960px;" data-i18n="supports">Supports: Media (MP3, MP4, MKV, AVI, FLAC, WAV, AAC, M4A, M4V, OGG, OGV, OPUS, WMA, WMV, MOV, WEBM, 3GP, JPG, PNG, GIF, WEBP, HEIC, BMP, TIFF, SVG, ICO), Docs &amp; Web (PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, EPUB, RTF, CSV, TXT, XML, JSON, HTML), Archives (ZIP, RAR, 7Z, TAR, GZ, BZ2, XZ, ZST), Executables (EXE, DLL, SO, DMG, ISO, APK)</div>
+      <input type="file" id="fileInput" multiple style="display:none;">
+      <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none;">
+    </div>
+
+    <div class="progress-wrapper" id="progressWrapper" style="margin-top:12px;">
+      <div class="progress-stats">
+        <span><span data-i18n="processing">Processing...</span> <span id="progressPercent">0%</span></span>
+        <span>
+          <span style="color:var(--green);"><span data-i18n="btnPass">Valid</span>: <span id="pPass">0</span></span> |
+          <span style="color:var(--accent);"><span data-i18n="btnUnk">Unknown</span>: <span id="pUnk">0</span></span> |
+          <span style="color:var(--red);"><span data-i18n="btnFail">Corrupted</span>: <span id="pFail">0</span></span>
+        </span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-lbl" data-i18n="statTotal">TOTAL SCANNED</span>
+      <span class="stat-val" id="cntAll">0</span>
+    </div>
+    <div class="stat-card valid">
+      <span class="stat-lbl" data-i18n="btnPass">VALID</span>
+      <span class="stat-val" id="cntPass">0</span>
+    </div>
+    <div class="stat-card fail">
+      <span class="stat-lbl" data-i18n="btnFail">CORRUPTED</span>
+      <span class="stat-val" id="cntFail">0</span>
+    </div>
+    <div class="stat-card unk">
+      <span class="stat-lbl" data-i18n="btnUnk">UNKNOWN / MISMATCH</span>
+      <span class="stat-val" id="cntUnk">0</span>
+    </div>
+    <div class="stat-card quar">
+      <span class="stat-lbl" data-i18n="statQuar">IN QUARANTINE</span>
+      <span class="stat-val" id="cntQuar">0</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <div class="filters" id="filterBtns">
+        <button class="btn active" data-filter="all"><span data-i18n="btnAll">All</span></button>
+        <button class="btn" data-filter="fail"><span data-i18n="btnFail">Corrupted</span></button>
+        <button class="btn" data-filter="unknown"><span data-i18n="btnUnk">Unknown</span></button>
+        <button class="btn" data-filter="pass"><span data-i18n="btnPass">Valid</span></button>
+        <input type="text" class="search-input" id="searchInput" placeholder="Filter file name, path, reason...">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn" id="btnSelectCorrupted" data-i18n="selCorrupted">Select Corrupted</button>
+        <button class="btn btn-accent" id="btnQuarantineSelected" disabled>
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M12 11v6"/><path d="m9 14 3 3 3-3"/></svg>
+          <span data-i18n="moveQuarantineBtn">Move Selected to Quarantine</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:10px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="chkAllResults" title="Toggle visible corrupted selection"></th>
+            <th data-sort="name" data-i18n="thName">File Name</th>
+            <th data-sort="ext" data-i18n="thExt">Extension</th>
+            <th data-sort="size" data-i18n="thSize">Size</th>
+            <th data-sort="status" data-i18n="thStatus">Status</th>
+            <th data-sort="details" data-i18n="thDiag">Diagnostics</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr id="emptyRow">
+            <td colspan="6" style="text-align:center;color:var(--muted);padding:28px;" data-i18n="empty">No files analyzed yet. Choose a non-C:\ drive/folder and run a scan.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="quarantine-panel" id="quarantineSection">
+    <div class="quarantine-hdr">
+      <div>
+        <h2>
+          <svg class="svg-ico" style="color:#f43f5e;" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5h14l-1.15 11.8A2.5 2.5 0 0 1 15.36 21.5H8.64a2.5 2.5 0 0 1-2.49-2.2L5 7.5Z" fill="currentColor" fill-opacity="0.22"/><path d="M3.5 6.5h17" stroke-width="2.1"/><path d="M9 6.5V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8v1.7"/><path d="M10.1 11.2l.35 5.6"/><path d="M13.9 11.2l-.35 5.6"/></svg>
+          <span data-i18n="quarTitle">Quarantine Review Folder (_OSIRIS_QUARANTINE)</span>
+        </h2>
+        <div class="path-text" id="quarantinePathText" style="margin-top:4px;">--</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn" id="btnOpenQuarantineFolder">
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+          <span data-i18n="openQuarDir">Open in Explorer</span>
+        </button>
+        <button class="btn" id="btnRefreshQuarantine">
+          <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          <span data-i18n="refreshBtn">Refresh</span>
+        </button>
+        <button class="btn btn-green" id="btnRestoreSelected" disabled data-i18n="restoreSelBtn">Restore Selected</button>
+        <button class="btn btn-danger" id="btnPurgeSelected" disabled data-i18n="purgeSelBtn">Permanently Delete Selected</button>
+        <button class="btn btn-danger" id="btnPurgeAll" disabled data-i18n="purgeAllBtn">Empty Quarantine (Delete All)</button>
+      </div>
+    </div>
+
+    <div style="font-size:0.82rem;color:var(--muted);" data-i18n="quarHint">Corrupted files are moved here first so you can manually check them (open in Explorer or preview) before restoring or permanently deleting them. No .bat deletion script required.</div>
+
+    <div class="table-wrap" style="max-height:320px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="chkAllQuarantine"></th>
+            <th data-i18n="thName">File Name</th>
+            <th data-i18n="thOrigPath">Original Path</th>
+            <th data-i18n="thSize">Size</th>
+            <th data-i18n="thDiag">Reason / Diagnostics</th>
+            <th data-i18n="thActions">Manual Review Actions</th>
+          </tr>
+        </thead>
+        <tbody id="quarantineBody">
+          <tr>
+            <td colspan="6" style="text-align:center;color:var(--muted);padding:20px;" data-i18n="quarEmpty">Quarantine folder is empty.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<div id="bgPlayer" style="position:fixed;bottom:-1px;left:-1px;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0;" aria-hidden="true">
+  <audio id="bgAudio" muted preload="auto"></audio>
+  <video id="bgVideo" muted preload="auto" playsinline></video>
+</div>
+
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-card">
+    <h3 id="confirmTitle">Confirm Permanent Deletion</h3>
+    <p id="confirmBody">Are you sure?</p>
+    <div class="modal-footer">
+      <button class="btn" id="confirmCancel" data-i18n="cancelBtn">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk" data-i18n="confirmDelBtn">Permanently Delete</button>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-accent" id="scrollToTopBtn" title="Back to top">
+  <span data-i18n="topBtn">TOP</span>
+  <svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+</button>
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  const SERVER_ORIGIN = (location.protocol === "http:" || location.protocol === "https:")
+    ? location.origin
+    : "http://127.0.0.1:8765";
+  const OSIRIS_TOKEN = (document.querySelector('meta[name="osiris-token"]') || {}).content || "";
+  const SESSION_TAB_ID = "del_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 10);
+  let sessionCloseSent = false;
+  let sessionHeartbeatTimer = null;
+  let sessionHeartbeatWired = false;
+
+  function sendSessionHeartbeat(mode = "alive") {
+    if (!OSIRIS_TOKEN) return;
+    if (mode === "closing") {
+      if (sessionCloseSent) return;
+      sessionCloseSent = true;
+    } else {
+      sessionCloseSent = false;
+    }
+    try {
+      fetch(`${SERVER_ORIGIN}/api/heartbeat`, {
+        method: "POST",
+        keepalive: mode === "closing",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Osiris-Token": OSIRIS_TOKEN
+        },
+        body: JSON.stringify({ tab_id: SESSION_TAB_ID, state: mode })
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
+  function startSessionHeartbeat() {
+    if (!OSIRIS_TOKEN) return;
+    sendSessionHeartbeat("alive");
+    if (sessionHeartbeatTimer) clearInterval(sessionHeartbeatTimer);
+    sessionHeartbeatTimer = setInterval(() => sendSessionHeartbeat("alive"), 10000);
+    if (!sessionHeartbeatWired) {
+      sessionHeartbeatWired = true;
+      window.addEventListener("pagehide", () => sendSessionHeartbeat("closing"));
+      window.addEventListener("beforeunload", () => sendSessionHeartbeat("closing"));
+      window.addEventListener("pageshow", () => sendSessionHeartbeat("alive"));
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") sendSessionHeartbeat("alive");
+      });
+    }
+  }
+
+  function apiHeaders(isJson = true) {
+    const h = {};
+    if (isJson) h["Content-Type"] = "application/json";
+    if (OSIRIS_TOKEN) h["X-Osiris-Token"] = OSIRIS_TOKEN;
+    return h;
+  }
+
+  const I18N = {
+    EN: {
+      title: "OSIRIS FILES CHECKER & DELETER",
+      sub: "Thorough Multi-Format File Integrity Auditor & Quarantine Deleter (Excludes C:\\)",
+      cProtected: "C:\\ EXCLUDED",
+      backIndexer: "Indexer",
+      installBtn: "Install Shortcuts",
+      targetDrive: "Target Drive / Folder (Non-C:\\):",
+      scanServerBtn: "Deep Backend Scan",
+      folderBtn: "Browse Folder",
+      pickFilesBtn: "Pick Files",
+      drop: "Click or drag & drop files or folders here to verify integrity",
+      subCheck: "Include Subfolders",
+      doubleCheck: "Deep Check (Full Container CRC & Media Decode)",
+      emptyFolderCheck: "Remove Empty Folders on Quarantine",
+      supports: "Supports: Media (MP3, MP4, MKV, AVI, FLAC, WAV, AAC, M4A, M4V, OGG, OGV, OPUS, WMA, WMV, MOV, WEBM, 3GP, JPG, PNG, GIF, WEBP, HEIC, BMP, TIFF, SVG, ICO), Docs & Web (PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, EPUB, RTF, CSV, TXT, XML, JSON, HTML), Archives (ZIP, RAR, 7Z, TAR, GZ, BZ2, XZ, ZST), Executables (EXE, DLL, SO, DMG, ISO, APK)",
+      processing: "Processing...",
+      statTotal: "TOTAL SCANNED",
+      btnAll: "All",
+      btnPass: "Valid",
+      btnFail: "Corrupted",
+      btnUnk: "Unknown",
+      statQuar: "IN QUARANTINE",
+      selCorrupted: "Select Corrupted",
+      moveQuarantineBtn: "Move Selected to Quarantine",
+      thName: "File Name",
+      thExt: "Ext",
+      thSize: "Size",
+      thStatus: "Status",
+      thDiag: "Diagnostics",
+      thOrigPath: "Original Path",
+      thActions: "Manual Review Actions",
+      empty: "No files analyzed yet. Choose a non-C:\\ drive/folder and run a scan.",
+      quarTitle: "Quarantine Review Folder (_OSIRIS_QUARANTINE)",
+      openQuarDir: "Open in Explorer",
+      refreshBtn: "Refresh",
+      restoreSelBtn: "Restore Selected",
+      purgeSelBtn: "Permanently Delete Selected",
+      purgeAllBtn: "Empty Quarantine (Delete All)",
+      quarHint: "Corrupted files are moved here first so you can manually check them (open in Explorer or preview) before restoring or permanently deleting them. No .bat deletion script required.",
+      quarEmpty: "Quarantine folder is empty.",
+      cancelBtn: "Cancel",
+      confirmDelBtn: "Permanently Delete",
+      cBlockedToast: "C:\\ drive is strictly protected and excluded from Deleter operations.",
+      statValid: "VALID",
+      statFail: "CORRUPTED",
+      statUnk: "UNKNOWN",
+      statQuarBadge: "QUARANTINED",
+      statCheck: "CHECKING...",
+      revealBtn: "Explorer",
+      previewBtn: "Check",
+      restoreBtn: "Restore",
+      delPermBtn: "Delete",
+      topBtn: "TOP",
+      topTitle: "Jump back to top",
+      light: "LIGHT",
+      dark: "DARK",
+      serverOn: "SERVER ONLINE",
+      serverLocal: "BROWSER LOCAL",
+      searchPh: "Filter file name, path, reason...",
+      rootPh: "D:\\ or D:\\FolderToVerify",
+      units: ["B", "KB", "MB", "GB", "TB"],
+      freeWord: "free",
+      permDelTitle: "Permanent Deletion",
+      emptyQuarTitle: "Empty Quarantine Folder",
+      confirmSingleDel: (name) => `Permanently delete "${name}" from _OSIRIS_QUARANTINE? This cannot be undone.`,
+      confirmMultiDel: (n) => `Permanently delete ${n} selected file(s) from _OSIRIS_QUARANTINE? This cannot be undone.`,
+      confirmAllDel: (n) => `Permanently delete ALL ${n} file(s) inside _OSIRIS_QUARANTINE after manual review?`,
+      diags: {}
+    },
+    FR: {
+      title: "OSIRIS VÉRIFICATEUR & NETTOYEUR",
+      sub: "Audit multi-formats approfondi & Quarantaine avant suppression définitive (C:\\ exclu)",
+      cProtected: "C:\\ EXCLU",
+      backIndexer: "Indexeur",
+      installBtn: "Installer Raccourcis",
+      targetDrive: "Disque / Dossier cible (hors C:\\) :",
+      scanServerBtn: "Scan Profond Serveur",
+      folderBtn: "Ouvrir Dossier",
+      pickFilesBtn: "Choisir Fichiers",
+      drop: "Cliquez ou glissez-déposez des fichiers ou dossiers ici pour vérifier l'intégrité",
+      subCheck: "Inclure les sous-dossiers",
+      doubleCheck: "Analyse Profonde (CRC conteneurs & Décodage média)",
+      emptyFolderCheck: "Supprimer les dossiers vides lors de la quarantaine",
+      supports: "Formats : Médias (MP3, MP4, MKV, AVI, FLAC, WAV, AAC, M4A, M4V, OGG, OGV, OPUS, WMA, WMV, MOV, WEBM, 3GP, JPG, PNG, GIF, WEBP, HEIC, BMP, TIFF, SVG, ICO), Docs & Web (PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, EPUB, RTF, CSV, TXT, XML, JSON, HTML), Archives (ZIP, RAR, 7Z, TAR, GZ, BZ2, XZ, ZST), Exécutables (EXE, DLL, SO, DMG, ISO, APK)",
+      processing: "Analyse en cours...",
+      statTotal: "TOTAL ANALYSÉ",
+      btnAll: "Tous",
+      btnPass: "Valides",
+      btnFail: "Corrompus",
+      btnUnk: "Inconnus",
+      statQuar: "EN QUARANTAINE",
+      selCorrupted: "Sélect. Corrompus",
+      moveQuarantineBtn: "Déplacer vers Quarantaine",
+      thName: "Nom du fichier",
+      thExt: "Ext.",
+      thSize: "Taille",
+      thStatus: "Statut",
+      thDiag: "Diagnostics",
+      thOrigPath: "Chemin d'origine",
+      thActions: "Actions de révision",
+      empty: "Aucun fichier analysé. Choisissez un disque/dossier hors C:\\ et lancez l'analyse.",
+      quarTitle: "Dossier de Quarantaine (_OSIRIS_QUARANTINE)",
+      openQuarDir: "Ouvrir dans Explorateur",
+      refreshBtn: "Actualiser",
+      restoreSelBtn: "Restaurer la sélection",
+      purgeSelBtn: "Supprimer définitivement la sélection",
+      purgeAllBtn: "Vider la Quarantaine (Tout supprimer)",
+      quarHint: "Les fichiers corrompus sont déplacés ici pour vérification manuelle avant restauration ou suppression définitive. Aucun script .bat requis.",
+      quarEmpty: "Le dossier de quarantaine est vide.",
+      cancelBtn: "Annuler",
+      confirmDelBtn: "Supprimer définitivement",
+      cBlockedToast: "Le lecteur C:\\ est protégé et strictement exclu du nettoyeur.",
+      statValid: "VALIDE",
+      statFail: "CORROMPU",
+      statUnk: "INCONNU",
+      statQuarBadge: "QUARANTAINE",
+      statCheck: "ANALYSE...",
+      revealBtn: "Explorateur",
+      previewBtn: "Vérifier",
+      restoreBtn: "Restaurer",
+      delPermBtn: "Supprimer",
+      topBtn: "HAUT",
+      topTitle: "Remonter en haut",
+      light: "CLAIR",
+      dark: "SOMBRE",
+      serverOn: "SERVEUR ACTIF",
+      serverLocal: "MODE LOCAL",
+      searchPh: "Filtrer nom, chemin, diagnostic...",
+      rootPh: "D:\\ ou D:\\DossierAVerifier",
+      units: ["o", "Ko", "Mo", "Go", "To"],
+      freeWord: "libres",
+      permDelTitle: "Suppression définitive",
+      emptyQuarTitle: "Vider la quarantaine",
+      confirmSingleDel: (name) => `Supprimer définitivement « ${name} » de _OSIRIS_QUARANTINE ? Action irréversible.`,
+      confirmMultiDel: (n) => `Supprimer définitivement ${n} fichier(s) sélectionné(s) de _OSIRIS_QUARANTINE ? Action irréversible.`,
+      confirmAllDel: (n) => `Supprimer définitivement TOUS les ${n} fichier(s) dans _OSIRIS_QUARANTINE après vérification manuelle ?`,
+      diags: {
+        "0-byte empty file.": "Fichier vide de 0 octet.",
+        "Valid header signature confirmed.": "Signature d'en-tête valide confirmée.",
+        "Invalid or missing container signature.": "Signature de conteneur invalide ou manquante.",
+        "Valid image header confirmed.": "En-tête d'image valide confirmé.",
+        "Invalid image magic bytes.": "Octets magiques d'image invalides.",
+        "Missing DOS MZ signature.": "Signature DOS MZ manquante.",
+        "Valid PE/MZ header.": "En-tête PE/MZ valide.",
+        "Valid %PDF signature.": "Signature %PDF valide.",
+        "Missing %PDF signature.": "Signature %PDF manquante.",
+        "PDF truncated: missing %%EOF trailer marker.": "PDF tronqué : marqueur %%EOF manquant.",
+        "Valid ZIP/OpenXML PK header.": "En-tête ZIP/OpenXML PK valide.",
+        "Missing PK archive header.": "En-tête d'archive PK manquant.",
+        "Damaged ZIP/OpenXML archive structure.": "Structure d'archive ZIP/OpenXML endommagée.",
+        "Passed header check and browser image decode.": "En-tête valide et décodage d'image réussi.",
+        "Header valid, but image data fails to decode.": "En-tête valide, échec du décodage d'image.",
+        "Passed header check and media stream decode.": "En-tête et décodage du flux média réussis.",
+        "Moved to _OSIRIS_QUARANTINE": "Déplacé vers _OSIRIS_QUARANTINE",
+        "Format not natively evaluated.": "Format non évalué nativement.",
+        "No binary NUL bytes; appears to be valid text.": "Aucun octet NUL ; fichier texte valide.",
+        "Binary NUL bytes detected in text file.": "Octets NUL binaires détectés dans le fichier texte."
+      }
+    },
+    DE: {
+      title: "OSIRIS DATEIPRÜFER & BEREINIGER",
+      sub: "Gründliche Multi-Format-Integritätsprüfung & Quarantäne vor endgültigem Löschen (ohne C:\\)",
+      cProtected: "C:\\ GESCHÜTZT",
+      backIndexer: "Indexer",
+      installBtn: "Verknüpfungen installieren",
+      targetDrive: "Ziellaufwerk / Ordner (ohne C:\\):",
+      scanServerBtn: "Tiefer Server-Scan",
+      folderBtn: "Ordner wählen",
+      pickFilesBtn: "Dateien wählen",
+      drop: "Klicken oder Dateien/Ordner hierher ziehen zur Integritätsprüfung",
+      subCheck: "Unterordner einschließen",
+      doubleCheck: "Tiefenprüfung (Container-CRC & Medien-Dekodierung)",
+      emptyFolderCheck: "Leere Ordner bei Quarantäne entfernen",
+      supports: "Formate: Medien (MP3, MP4, MKV, AVI, FLAC, WAV, AAC, M4A, M4V, OGG, OGV, OPUS, WMA, WMV, MOV, WEBM, 3GP, JPG, PNG, GIF, WEBP, HEIC, BMP, TIFF, SVG, ICO), Dokumente & Web (PDF, DOCX, XLSX, PPTX, ODT, ODS, ODP, EPUB, RTF, CSV, TXT, XML, JSON, HTML), Archive (ZIP, RAR, 7Z, TAR, GZ, BZ2, XZ, ZST), Programme (EXE, DLL, SO, DMG, ISO, APK)",
+      processing: "Verarbeitung...",
+      statTotal: "GESAMT GEPRÜFT",
+      btnAll: "Alle",
+      btnPass: "Gültig",
+      btnFail: "Beschädigt",
+      btnUnk: "Unbekannt",
+      statQuar: "IN QUARANTÄNE",
+      selCorrupted: "Beschädigte wählen",
+      moveQuarantineBtn: "In Quarantäne verschieben",
+      thName: "Dateiname",
+      thExt: "Typ",
+      thSize: "Größe",
+      thStatus: "Status",
+      thDiag: "Diagnose",
+      thOrigPath: "Ursprungspfad",
+      thActions: "Manuelle Prüfung",
+      empty: "Noch keine Dateien geprüft. Laufwerk/Ordner (außer C:\\) wählen und scannen.",
+      quarTitle: "Quarantäne-Prüfordner (_OSIRIS_QUARANTINE)",
+      openQuarDir: "Im Explorer öffnen",
+      refreshBtn: "Aktualisieren",
+      restoreSelBtn: "Auswahl wiederherstellen",
+      purgeSelBtn: "Auswahl endgültig löschen",
+      purgeAllBtn: "Quarantäne leeren (Alle löschen)",
+      quarHint: "Beschädigte Dateien werden zuerst hierher verschoben, damit Sie sie manuell prüfen können, bevor Sie sie wiederherstellen oder endgültig löschen. Kein .bat-Skript nötig.",
+      quarEmpty: "Der Quarantäne-Ordner ist leer.",
+      cancelBtn: "Abbrechen",
+      confirmDelBtn: "Endgültig löschen",
+      cBlockedToast: "Laufwerk C:\\ ist streng geschützt und ausgeschlossen.",
+      statValid: "GÜLTIG",
+      statFail: "BESCHÄDIGT",
+      statUnk: "UNBEKANNT",
+      statQuarBadge: "QUARANTÄNE",
+      statCheck: "PRÜFUNG...",
+      revealBtn: "Explorer",
+      previewBtn: "Prüfen",
+      restoreBtn: "Wiederherstellen",
+      delPermBtn: "Löschen",
+      topBtn: "OBEN",
+      topTitle: "Nach oben springen",
+      light: "HELL",
+      dark: "DUNKEL",
+      serverOn: "LIVE-SERVER",
+      serverLocal: "LOKAL",
+      searchPh: "Dateiname, Pfad, Diagnose filtern...",
+      rootPh: "D:\\ oder D:\\OrdnerPruefen",
+      units: ["B", "KB", "MB", "GB", "TB"],
+      freeWord: "frei",
+      permDelTitle: "Endgültiges Löschen",
+      emptyQuarTitle: "Quarantäne-Ordner leeren",
+      confirmSingleDel: (name) => `„${name}“ endgültig aus _OSIRIS_QUARANTINE löschen? Dies kann nicht rückgängig gemacht werden.`,
+      confirmMultiDel: (n) => `${n} ausgewählte Datei(en) endgültig aus _OSIRIS_QUARANTINE löschen? Dies kann nicht rückgängig gemacht werden.`,
+      confirmAllDel: (n) => `ALLE ${n} Datei(en) in _OSIRIS_QUARANTINE nach manueller Prüfung endgültig löschen?`,
+      diags: {
+        "0-byte empty file.": "Leere 0-Byte-Datei.",
+        "Valid header signature confirmed.": "Gültige Header-Signatur bestätigt.",
+        "Invalid or missing container signature.": "Ungültige oder fehlende Container-Signatur.",
+        "Valid image header confirmed.": "Gültiger Bild-Header bestätigt.",
+        "Invalid image magic bytes.": "Ungültige Bild-Magic-Bytes.",
+        "Missing DOS MZ signature.": "Fehlende DOS-MZ-Signatur.",
+        "Valid PE/MZ header.": "Gültiger PE/MZ-Header.",
+        "Valid %PDF signature.": "Gültige %PDF-Signatur.",
+        "Missing %PDF signature.": "Fehlende %PDF-Signatur.",
+        "PDF truncated: missing %%EOF trailer marker.": "PDF abgeschnitten: %%EOF-Endmarkierung fehlt.",
+        "Valid ZIP/OpenXML PK header.": "Gültiger ZIP/OpenXML-PK-Header.",
+        "Missing PK archive header.": "Fehlender PK-Archiv-Header.",
+        "Damaged ZIP/OpenXML archive structure.": "Beschädigte ZIP/OpenXML-Archivstruktur.",
+        "Passed header check and browser image decode.": "Header-Prüfung & Bilddekodierung bestanden.",
+        "Header valid, but image data fails to decode.": "Header gültig, aber Bilddekodierung fehlgeschlagen.",
+        "Passed header check and media stream decode.": "Header-Prüfung & Mediendekodierung bestanden.",
+        "Moved to _OSIRIS_QUARANTINE": "Nach _OSIRIS_QUARANTINE verschoben",
+        "Format not natively evaluated.": "Format nicht nativ ausgewertet.",
+        "No binary NUL bytes; appears to be valid text.": "Keine NUL-Bytes; gültige Textdatei.",
+        "Binary NUL bytes detected in text file.": "Binäre NUL-Bytes in Textdatei erkannt."
+      }
+    }
+  };
+
+  const state = {
+    lang: "EN",
+    theme: "dark",
+    serverOnline: false,
+    activeRoot: "",
+    filter: "all",
+    query: "",
+    sortKey: "status",
+    sortDir: 1,
+    records: [],
+    quarantineItems: [],
+    dirHandle: null,
+    selectedScanKeys: new Set(),
+    selectedQuarKeys: new Set(),
+    pendingConfirmAction: null
+  };
+
+  const el = (id) => document.getElementById(id);
+
+  const SVG = {
+    sun: '<svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>',
+    moon: '<svg class="svg-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>'
+  };
+
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[m]));
+  }
+
+  function showToast(msg, ms = 2800) {
+    const t = el("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => t.classList.remove("show"), ms);
+  }
+
+  function formatSize(bytes) {
+    const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+    const units = t.units || ["B", "KB", "MB", "GB", "TB"];
+    const b = Number(bytes || 0);
+    if (b <= 0) return `0 ${units[0]}`;
+    const i = Math.min(units.length - 1, Math.floor(Math.log(b) / Math.log(1024)));
+    return (b / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 2) + " " + units[i];
+  }
+
+  function isBlockedCPath(rawPath) {
+    const s = String(rawPath || "").trim().replace(/\//g, "\\").toUpperCase();
+    return s === "C:" || s.startsWith("C:\\") || s.startsWith("\\\\?\\C:") || s.startsWith("\\\\.\\C:");
+  }
+
+  function detectDriveFromHref() {
+    try {
+      const m = location.href.match(/^file:\/\/\/([A-Za-z]):[\/\\]/i);
+      if (m) return m[1].toUpperCase() + ":\\";
+    } catch (_) {}
+    return "";
+  }
+
+  function syncSettingsStorage(lang, theme) {
+    try {
+      localStorage.setItem("osiris_lang", lang);
+      localStorage.setItem("osiris_theme", theme);
+      const raw = JSON.parse(localStorage.getItem("files_indexation_settings_v1") || "{}");
+      raw.lang = lang;
+      raw.theme = theme;
+      localStorage.setItem("files_indexation_settings_v1", JSON.stringify(raw));
+    } catch (_) {}
+  }
+
+  function normalizeLang(raw) {
+    const up = String(raw || "").trim().toUpperCase();
+    return I18N[up] ? up : "EN";
+  }
+
+  function translateDiag(text, lang) {
+    if (!text) return "";
+    const pack = I18N[normalizeLang(lang)] || I18N.EN;
+    if (pack.diags && pack.diags[text]) return pack.diags[text];
+    return text;
+  }
+
+  function loadInitialSettings() {
+    try {
+      const shared = JSON.parse(localStorage.getItem("files_indexation_settings_v1") || "{}");
+      state.lang = normalizeLang(shared.lang || localStorage.getItem("osiris_lang") || "EN");
+      state.theme = (shared.theme || localStorage.getItem("osiris_theme") || "dark") === "light" ? "light" : "dark";
+    } catch (_) {
+      state.lang = "EN";
+      state.theme = "dark";
+    }
+    applyThemeAndLang();
+  }
+
+  function applyThemeAndLang() {
+    state.lang = normalizeLang(state.lang);
+    const t = I18N[state.lang] || I18N.EN;
+    document.body.classList.toggle("light-theme", state.theme === "light");
+    document.documentElement.setAttribute("lang", state.lang.toLowerCase());
+    document.title = t.title;
+    el("themeIcon").innerHTML = state.theme === "light" ? SVG.sun : SVG.moon;
+    el("themeLabel").textContent = state.theme === "light" ? t.light : t.dark;
+    if (el("btnLangToggleLabel")) el("btnLangToggleLabel").textContent = state.lang;
+    if (el("serverBadgeText")) el("serverBadgeText").textContent = state.serverOnline ? t.serverOn : t.serverLocal;
+    if (el("searchInput")) el("searchInput").placeholder = t.searchPh;
+    if (el("rootInput")) el("rootInput").placeholder = t.rootPh;
+    if (el("scrollToTopBtn")) el("scrollToTopBtn").title = t.topTitle;
+    document.querySelectorAll("[data-i18n]").forEach((node) => {
+      const key = node.getAttribute("data-i18n");
+      if (t[key]) node.textContent = t[key];
+    });
+    renderResultsTable();
+    renderQuarantineTable();
+  }
+
+  async function detectBackend() {
+    const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 1600);
+      const res = await fetch(`${SERVER_ORIGIN}/api/deleter/drives`, { signal: ctrl.signal, cache: "no-store" });
+      clearTimeout(tid);
+      if (!res.ok) throw new Error("offline");
+      const data = await res.json();
+      state.serverOnline = true;
+      if (!OSIRIS_TOKEN && location.protocol === "file:") {
+        try { location.replace(`${SERVER_ORIGIN}/deleter`); return true; } catch (_) {}
+      }
+      el("serverBadge").classList.add("server-on");
+      el("serverBadgeText").textContent = t.serverOn;
+
+      const sel = el("driveSelect");
+      const drives = Array.isArray(data.drives) ? data.drives : [];
+      sel.innerHTML = "";
+      drives.forEach((d) => {
+        const opt = document.createElement("option");
+        opt.value = d.drive;
+        const lbl = d.label ? ` (${d.label})` : "";
+        opt.textContent = `${d.drive}${lbl} · ${formatSize(d.free)} ${t.freeWord || "free"}`;
+        sel.appendChild(opt);
+      });
+
+      const hrefDrv = detectDriveFromHref();
+      const srvDef = String(data.default_root || "").replace(/\//g, "\\").toUpperCase();
+      const preferred = (srvDef && drives.find((d) => d.drive.toUpperCase() === srvDef))
+        || drives.find((d) => d.drive.toUpperCase() === hrefDrv.toUpperCase())
+        || drives.find((d) => !isBlockedCPath(d.drive))
+        || null;
+      if (preferred) {
+        sel.value = preferred.drive;
+        state.activeRoot = preferred.drive;
+        el("rootInput").value = preferred.drive;
+        await loadQuarantineList(preferred.drive);
+      }
+      return true;
+    } catch (_) {
+      state.serverOnline = false;
+      el("serverBadge").classList.remove("server-on");
+      el("serverBadgeText").textContent = t.serverLocal;
+      const fallbackDrv = detectDriveFromHref();
+      if (!isBlockedCPath(fallbackDrv)) {
+        state.activeRoot = fallbackDrv;
+        el("rootInput").value = fallbackDrv;
+      }
+      return false;
+    }
+  }
+
+  async function runServerScan() {
+    const t = I18N[state.lang] || I18N.EN;
+    const targetRoot = (el("rootInput").value || el("driveSelect").value || "").trim();
+    if (!targetRoot || isBlockedCPath(targetRoot)) {
+      showToast(t.cBlockedToast, 3400);
+      return;
+    }
+    if (!state.serverOnline) {
+      showToast("Local Python backend is offline. Use 'Browse Folder' or start Osiris_Indexer_Deleter.exe.", 3500);
+      return;
+    }
+
+    const btn = el("btnServerScan");
+    btn.classList.add("is-spinning");
+    btn.disabled = true;
+    el("progressWrapper").style.display = "block";
+    el("progressBar").className = "progress-bar";
+    el("progressBar").style.width = "30%";
+    el("progressPercent").textContent = "Scanning...";
+
+    try {
+      const deep = el("doubleCheck").checked;
+      const includeSubfolders = el("subfolderCheck").checked;
+      const res = await fetch(`${SERVER_ORIGIN}/api/deleter/scan`, {
+        method: "POST",
+        headers: apiHeaders(true),
+        body: JSON.stringify({ root: targetRoot, include_subfolders: includeSubfolders, deep })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.message || data.error || "Scan failed", 3400);
+        return;
+      }
+      state.activeRoot = data.root;
+      state.selectedScanKeys.clear();
+      state.records = (data.files || []).map((f, idx) => ({
+        key: f.rel || f.path || String(idx),
+        name: f.name,
+        ext: f.ext || "-",
+        size: Number(f.size || 0),
+        status: f.status,
+        details: f.details,
+        path: f.path,
+        rel: f.rel,
+        source: "server",
+        quarantined: false
+      }));
+
+      el("progressBar").style.width = "100%";
+      el("progressPercent").textContent = `100% (${state.records.length} files in ${data.elapsed_sec}s)`;
+      updateScanProgressSummary();
+      renderQuarantineData(data.quarantine);
+
+      if (deep && state.records.length > 0) {
+        await runBrowserDeepMediaPass();
+      }
+      renderResultsTable();
+    } catch (err) {
+      showToast("Backend scan error: " + String(err), 3400);
+    } finally {
+      btn.classList.remove("is-spinning");
+      btn.disabled = false;
+    }
+  }
+
+  async function runBrowserDeepMediaPass() {
+    const imgExts = new Set(["jpg", "jpeg", "png", "gif", "webp", "bmp"]);
+    const audioExts = new Set(["mp3", "wav", "ogg", "m4a", "aac", "flac", "opus"]);
+    const videoExts = new Set(["mp4", "m4v", "webm", "ogv"]);
+    const candidates = state.records.filter((r) =>
+      r.source === "server" &&
+      r.status === "VALID" &&
+      r.size > 0 &&
+      r.size <= 150 * 1024 * 1024 &&
+      (imgExts.has(r.ext) || audioExts.has(r.ext) || videoExts.has(r.ext))
+    );
+    const maxDeep = Math.min(candidates.length, 150);
+    for (let i = 0; i < maxDeep; i++) {
+      const rec = candidates[i];
+      const url = `${SERVER_ORIGIN}/api/file?path=${encodeURIComponent(rec.path)}`;
+      if (imgExts.has(rec.ext)) {
+        const res = await testImageUrlDecode(url);
+        rec.status = res.status;
+        rec.details = res.details;
+      } else {
+        const mType = audioExts.has(rec.ext) ? "audio" : "video";
+        const res = await testMediaUrlDecode(url, mType);
+        rec.status = res.status;
+        rec.details = res.details;
+      }
+      if ((i + 1) % 10 === 0 || i + 1 === maxDeep) {
+        updateScanProgressSummary();
+        renderResultsTable();
+      }
+    }
+  }
+
+  function updateScanProgressSummary() {
+    let pass = 0, fail = 0, unk = 0;
+    state.records.forEach((r) => {
+      if (r.status === "VALID") pass++;
+      else if (r.status === "CORRUPTED") fail++;
+      else if (r.status === "UNKNOWN") unk++;
+    });
+    el("pPass").textContent = String(pass);
+    el("pFail").textContent = String(fail);
+    el("pUnk").textContent = String(unk);
+    el("cntAll").textContent = String(state.records.length);
+    el("cntPass").textContent = String(pass);
+    el("cntFail").textContent = String(fail);
+    el("cntUnk").textContent = String(unk);
+    const bar = el("progressBar");
+    bar.className = fail > 0 ? "progress-bar danger" : (unk > 0 ? "progress-bar warning" : "progress-bar success");
+    updateQuarantineButtonState();
+  }
+
+  async function handleLocalFiles(fileList, fileHandleMap) {
+    const t = I18N[state.lang] || I18N.EN;
+    const files = Array.from(fileList || []).filter((f) => {
+      const rel = f.webkitRelativePath || f.name;
+      return !rel.includes("_OSIRIS_QUARANTINE") && !rel.toLowerCase().includes("_osiris_runtime");
+    });
+    if (!files.length) return;
+
+    const subOk = el("subfolderCheck").checked;
+    const filteredFiles = subOk
+      ? files
+      : files.filter((f) => !f.webkitRelativePath || f.webkitRelativePath.split("/").length <= 2);
+
+    el("progressWrapper").style.display = "block";
+    el("progressBar").className = "progress-bar";
+    state.selectedScanKeys.clear();
+    state.records = [];
+
+    for (let i = 0; i < filteredFiles.length; i++) {
+      const file = filteredFiles[i];
+      const ext = file.name.includes(".") ? file.name.split(".").pop().toLowerCase() : "";
+      const relPath = file.webkitRelativePath || file.name;
+      const audit = await auditFile(file, ext);
+      const rec = {
+        key: relPath,
+        name: file.name,
+        ext: ext || "-",
+        size: file.size,
+        status: audit.status,
+        details: audit.details,
+        path: relPath,
+        rel: relPath,
+        fileObj: file,
+        handleInfo: fileHandleMap ? fileHandleMap.get(relPath) : null,
+        source: "browser",
+        quarantined: false
+      };
+      state.records.push(rec);
+      const pct = Math.round(((i + 1) / filteredFiles.length) * 100);
+      el("progressBar").style.width = pct + "%";
+      el("progressPercent").textContent = `${pct}% (${i + 1}/${filteredFiles.length})`;
+      if ((i + 1) % 15 === 0 || i + 1 === filteredFiles.length) {
+        updateScanProgressSummary();
+        renderResultsTable();
+      }
+    }
+    if (!state.records.length) {
+      showToast(t.empty, 2200);
+    }
+  }
+
+  function setFileRelPath(fileObj, relPath) {
+    try {
+      Object.defineProperty(fileObj, "webkitRelativePath", { value: relPath, configurable: true });
+    } catch (_) {}
+    return fileObj;
+  }
+
+  function readAllDirEntries(dirEntry) {
+    return new Promise((resolve) => {
+      const reader = dirEntry.createReader();
+      const all = [];
+      const pump = () => {
+        reader.readEntries((batch) => {
+          if (!batch || !batch.length) resolve(all);
+          else { all.push(...batch); pump(); }
+        }, () => resolve(all));
+      };
+      pump();
+    });
+  }
+
+  async function collectDroppedEntry(entry, prefix, depth, includeSub, acc) {
+    if (!entry) return;
+    const lowE = String(entry.name || "").toLowerCase();
+    if (lowE === "_osiris_quarantine" || lowE === "_osiris_runtime") return;
+    if (entry.isFile) {
+      await new Promise((resolve) => {
+        entry.file((f) => {
+          const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+          acc.push(setFileRelPath(f, rel));
+          resolve();
+        }, () => resolve());
+      });
+    } else if (entry.isDirectory) {
+      if (depth > 0 && !includeSub) return;
+      if (depth > 20) return;
+      const nextPrefix = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const children = await readAllDirEntries(entry);
+      for (const ch of children) {
+        await collectDroppedEntry(ch, nextPrefix, depth + 1, includeSub, acc);
+      }
+    }
+  }
+
+  async function handleDroppedTransfer(dt) {
+    const includeSub = el("subfolderCheck").checked;
+    const items = dt && dt.items ? Array.from(dt.items) : [];
+    const entries = items
+      .map((it) => (typeof it.webkitGetAsEntry === "function" ? it.webkitGetAsEntry() : null))
+      .filter(Boolean);
+    if (entries.length) {
+      const collected = [];
+      for (const entry of entries) {
+        await collectDroppedEntry(entry, "", 0, includeSub, collected);
+      }
+      if (collected.length) {
+        await handleLocalFiles(collected);
+      }
+      return;
+    }
+    if (dt && dt.files && dt.files.length) {
+      await handleLocalFiles(dt.files);
+    }
+  }
+
+  async function browseFolderLocal() {
+    if (window.showDirectoryPicker) {
+      try {
+        const dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+        state.dirHandle = dirHandle;
+        const collected = [];
+        const handleMap = new Map();
+        const includeSub = el("subfolderCheck").checked;
+        async function walk(handle, prefix, depth) {
+          for await (const [name, entry] of handle.entries()) {
+            const lowN = String(name || "").toLowerCase();
+            if (lowN === "_osiris_quarantine" || lowN === "_osiris_runtime") continue;
+            const rel = prefix ? `${prefix}/${name}` : name;
+            if (entry.kind === "directory") {
+              if (includeSub && depth < 16) await walk(entry, rel, depth + 1);
+            } else {
+              const f = await entry.getFile();
+              setFileRelPath(f, `${dirHandle.name}/${rel}`);
+              collected.push(f);
+              handleMap.set(`${dirHandle.name}/${rel}`, { parentHandle: handle, entryHandle: entry, rel });
+            }
+          }
+        }
+        await walk(dirHandle, "", 0);
+        await handleLocalFiles(collected, handleMap);
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+    }
+    state.dirHandle = null;
+    el("folderInput").click();
+  }
+
+  async function auditFile(file, ext) {
+    if (file.size === 0) {
+      return { status: "CORRUPTED", details: "0-byte empty file." };
+    }
+    const dc = el("doubleCheck").checked;
+    const headerBuffer = await file.slice(0, 64).arrayBuffer();
+    const arr = new Uint8Array(headerBuffer);
+    let h = "";
+    for (let i = 0; i < arr.length; i++) h += arr[i].toString(16).padStart(2, "0");
+
+    const hdr = (sig, pass, fail) => (sig ? pass : fail);
+    const hdrDecode = (sig, mediaType) => {
+      if (!sig) return { status: "CORRUPTED", details: "Invalid or missing container signature." };
+      if (!dc) return { status: "VALID", details: "Valid header signature confirmed." };
+      const url = URL.createObjectURL(file);
+      return testMediaUrlDecode(url, mediaType, true);
+    };
+    const hdrImg = (sig) => {
+      if (!sig) return { status: "CORRUPTED", details: "Invalid image magic bytes." };
+      if (!dc) return { status: "VALID", details: "Valid image header confirmed." };
+      const url = URL.createObjectURL(file);
+      return testImageUrlDecode(url, true);
+    };
+
+    switch (ext) {
+      case "exe": case "dll":
+        return hdr(h.startsWith("4d5a"),
+          { status: "VALID", details: "Valid PE/MZ header." },
+          { status: "CORRUPTED", details: "Missing DOS MZ signature." });
+      case "so":
+        return hdr(h.startsWith("7f454c46"),
+          { status: "VALID", details: "Valid ELF header." },
+          { status: "CORRUPTED", details: "Missing ELF magic bytes." });
+      case "apk":
+        return hdr(h.startsWith("504b0304") || h.startsWith("504b0506") || h.startsWith("504b0708"),
+          { status: "VALID", details: "Valid APK (ZIP) container signature." },
+          { status: "CORRUPTED", details: "Missing APK/ZIP header signature." });
+      case "dmg":
+        return hdr(h.startsWith("7801730d62626060") || file.size > 512,
+          { status: "VALID", details: "DMG structure plausible (trailer check requires full read)." },
+          { status: "UNKNOWN", details: "DMG header inconclusive." });
+      case "iso":
+        return hdr(file.size >= 2048,
+          { status: "VALID", details: "ISO size plausible; deep sector check not possible in-browser." },
+          { status: "CORRUPTED", details: "File too small to be a valid ISO image." });
+      case "pdf":
+        return hdr(h.startsWith("25504446"),
+          { status: "VALID", details: "Valid %PDF signature." },
+          { status: "CORRUPTED", details: "Missing %PDF signature." });
+      case "docx": case "xlsx": case "pptx": case "zip": case "ods": case "odt": case "odp":
+        return hdr(h.startsWith("504b0304") || h.startsWith("504b0506") || h.startsWith("504b0708"),
+          { status: "VALID", details: "Valid ZIP/OpenXML PK header." },
+          { status: "CORRUPTED", details: "Missing PK archive header." });
+      case "epub":
+        return hdr(h.startsWith("504b0304"),
+          { status: "VALID", details: "Valid EPUB (ZIP) container." },
+          { status: "CORRUPTED", details: "Missing EPUB/ZIP PK header." });
+      case "rtf":
+        return hdr(h.startsWith("7b5c727466"),
+          { status: "VALID", details: "Valid RTF {\\rtf signature." },
+          { status: "CORRUPTED", details: "Missing RTF opening brace/signature." });
+      case "csv": case "txt": case "md": case "log": case "ini":
+        return hdr(!h.includes("00") || h.startsWith("fffe") || h.startsWith("feff"),
+          { status: "VALID", details: "No binary NUL bytes; appears to be valid text." },
+          { status: "CORRUPTED", details: "Binary NUL bytes detected in text file." });
+      case "xml":
+        return hdr(h.startsWith("3c3f786d6c") || h.startsWith("3c") || h.startsWith("efbbbf3c"),
+          { status: "VALID", details: "Valid XML/UTF-8 BOM opening tag." },
+          { status: "CORRUPTED", details: "Missing XML declaration or opening tag." });
+      case "json": {
+        const snippet = await file.slice(0, 512).text().catch(() => "");
+        const trimmed = snippet.trim();
+        return hdr(trimmed.startsWith("{") || trimmed.startsWith("["),
+          { status: "VALID", details: "JSON opens with valid object or array." },
+          { status: "CORRUPTED", details: "JSON does not start with { or [." });
+      }
+      case "html": case "htm": {
+        const snippet = await file.slice(0, 512).text().catch(() => "");
+        const trimmed = snippet.trim().toLowerCase();
+        const validHtml = trimmed.includes("<html") || trimmed.includes("<!doctype") || trimmed.includes("<body") || trimmed.includes("<head");
+        return hdr(validHtml && !h.includes("00"),
+          { status: "VALID", details: "Valid HTML opening tag or structure." },
+          { status: "CORRUPTED", details: "Missing HTML structure or invalid text file." });
+      }
+      case "jpg": case "jpeg":
+        if (h.startsWith("89504e470d0a1a0a")) return { status: "UNKNOWN", details: "Extension mismatch: file is a PNG image saved with a .jpg/.jpeg extension." };
+        if (h.startsWith("47494638")) return { status: "UNKNOWN", details: "Extension mismatch: file is a GIF image saved with a .jpg/.jpeg extension." };
+        if (h.startsWith("52494646") && h.substring(16, 24) === "57454250") return { status: "UNKNOWN", details: "Extension mismatch: file is a WebP image saved with a .jpg/.jpeg extension." };
+        return hdrImg(h.startsWith("ffd8ff"));
+      case "png":
+        if (h.startsWith("ffd8ff")) return { status: "UNKNOWN", details: "Extension mismatch: file is a JPEG image saved with a .png extension." };
+        if (h.startsWith("47494638")) return { status: "UNKNOWN", details: "Extension mismatch: file is a GIF image saved with a .png extension." };
+        if (h.startsWith("52494646") && h.substring(16, 24) === "57454250") return { status: "UNKNOWN", details: "Extension mismatch: file is a WebP image saved with a .png extension." };
+        return hdrImg(h.startsWith("89504e470d0a1a0a"));
+      case "gif":
+        if (h.startsWith("ffd8ff")) return { status: "UNKNOWN", details: "Extension mismatch: file is a JPEG image saved with a .gif extension." };
+        if (h.startsWith("89504e470d0a1a0a")) return { status: "UNKNOWN", details: "Extension mismatch: file is a PNG image saved with a .gif extension." };
+        return hdrImg(h.startsWith("47494638"));
+      case "webp":
+        if (h.startsWith("ffd8ff")) return { status: "UNKNOWN", details: "Extension mismatch: file is a JPEG image saved with a .webp extension." };
+        if (h.startsWith("89504e470d0a1a0a")) return { status: "UNKNOWN", details: "Extension mismatch: file is a PNG image saved with a .webp extension." };
+        if (h.startsWith("47494638")) return { status: "UNKNOWN", details: "Extension mismatch: file is a GIF image saved with a .webp extension." };
+        return hdrImg(h.startsWith("52494646") && h.substring(16, 24) === "57454250");
+      case "heic": case "heif":
+        return hdr(h.includes("6674797068656963") || h.includes("667479706d736631") || h.includes("6674797068656966"),
+          { status: "VALID", details: "Valid HEIC/HEIF ftyp atom." },
+          { status: "CORRUPTED", details: "Missing HEIC/HEIF ftyp atom." });
+      case "bmp":
+        return hdrImg(h.startsWith("424d"));
+      case "tiff": case "tif":
+        return hdr(h.startsWith("49492a00") || h.startsWith("4d4d002a"),
+          { status: "VALID", details: "Valid image header confirmed." },
+          { status: "CORRUPTED", details: "Invalid image magic bytes." });
+      case "ico":
+        return hdr(h.startsWith("00000100") || h.startsWith("00000200"),
+          { status: "VALID", details: "Valid ICO/CUR magic bytes." },
+          { status: "CORRUPTED", details: "Missing ICO magic bytes." });
+      case "svg": {
+        const snip = await file.slice(0, 256).text().catch(() => "");
+        return hdr(snip.includes("<svg") || snip.includes("<?xml"),
+          { status: "VALID", details: "SVG contains valid opening tag." },
+          { status: "CORRUPTED", details: "SVG missing <svg or <?xml tag." });
+      }
+      case "mp3": {
+        const isID3v2 = h.includes("494433");
+        const isFtypBox = h.includes("66747970");
+        const isAPEv2 = h.includes("4150455441474558");
+        const isFLV = h.includes("464c5601");
+        const isRIFF = h.includes("52494646");
+        let isMPEGSync = /^ff[ef][0-9a-f]/.test(h);
+        if (!isMPEGSync && !isID3v2 && !isFtypBox && !isAPEv2 && !isFLV && !isRIFF) {
+          const scanBuf = await file.slice(0, 131072).arrayBuffer().catch(() => null);
+          if (scanBuf) {
+            const sa = new Uint8Array(scanBuf);
+            for (let i = 0; i < sa.length - 2; i++) {
+              if ((sa[i] === 0x49 && sa[i + 1] === 0x44 && sa[i + 2] === 0x33) ||
+                  (sa[i] === 0xff && (sa[i + 1] & 0xe0) === 0xe0)) {
+                isMPEGSync = true;
+                break;
+              }
+            }
+          }
+        }
+        let isID3v1 = false;
+        if (!isID3v2 && !isMPEGSync && !isFtypBox && !isAPEv2 && !isFLV && !isRIFF && file.size >= 128) {
+          const tail = await file.slice(-128, -125).arrayBuffer().catch(() => null);
+          if (tail) {
+            const t = new Uint8Array(tail);
+            isID3v1 = t[0] === 0x54 && t[1] === 0x41 && t[2] === 0x47;
+          }
+        }
+        return hdrDecode(isID3v2 || isMPEGSync || isFtypBox || isAPEv2 || isFLV || isRIFF || isID3v1, "audio");
+      }
+      case "aac":
+        return hdrDecode(/^fff[19]/.test(h) || /^ffe[19]/.test(h) || h.substring(8, 16) === "66747970" || h.startsWith("41444946") || h.startsWith("494433"), "audio");
+      case "m4a": case "m4b": case "m4p":
+        return hdrDecode(h.substring(8, 16) === "66747970", "audio");
+      case "ogg": case "oga": case "opus":
+        return hdrDecode(h.startsWith("4f676753"), "audio");
+      case "flac":
+        return hdrDecode(h.startsWith("664c6143") || h.startsWith("494433"), "audio");
+      case "wav":
+        return hdrDecode(h.startsWith("52494646") && h.substring(16, 24) === "57415645", "audio");
+      case "wma": case "wmv": case "asf":
+        return hdrDecode(h.startsWith("3026b2758e66cf11"), ext === "wma" ? "audio" : "video");
+      case "aiff": case "aif":
+        return hdrDecode(h.startsWith("464f524d") && (h.substring(16, 24) === "41494646" || h.substring(16, 24) === "41494643"), "audio");
+      case "mp4": case "m4v": case "mp4v": case "3gp": case "3g2":
+        return hdrDecode(h.substring(8, 16) === "66747970", "video");
+      case "mov":
+        return hdrDecode(["66747970", "6d6f6f76", "77696465", "6d646174"].includes(h.substring(8, 16)), "video");
+      case "mkv": case "webm":
+        return hdrDecode(h.startsWith("1a45dfa3"), "video");
+      case "avi":
+        return hdrDecode(h.startsWith("52494646") && h.substring(16, 24) === "41564920", "video");
+      case "ogv":
+        return hdrDecode(h.startsWith("4f676753"), "video");
+      case "flv":
+        return hdrDecode(h.startsWith("464c5601"), "video");
+      case "rar":
+        return hdr(h.startsWith("526172211a07"), { status: "VALID", details: "Valid RAR signature." }, { status: "CORRUPTED", details: "Missing RAR magic bytes." });
+      case "7z":
+        return hdr(h.startsWith("377abcaf271c"), { status: "VALID", details: "Valid 7-Zip signature." }, { status: "CORRUPTED", details: "Missing 7z magic bytes." });
+      case "gz": case "tgz":
+        return hdr(h.startsWith("1f8b"), { status: "VALID", details: "Valid GZip magic bytes." }, { status: "CORRUPTED", details: "Missing GZip magic bytes." });
+      case "bz2":
+        return hdr(h.startsWith("425a68"), { status: "VALID", details: "Valid BZip2 signature (BZh)." }, { status: "CORRUPTED", details: "Missing BZip2 magic bytes." });
+      case "tar": {
+        const tarBuf = await file.slice(0, 512).arrayBuffer().catch(() => null);
+        if (!tarBuf) return { status: "UNKNOWN", details: "Could not read TAR header block." };
+        const tarArr = new Uint8Array(tarBuf);
+        const ustar = String.fromCharCode(...tarArr.slice(257, 262));
+        return hdr(ustar === "ustar", { status: "VALID", details: "Valid TAR ustar magic confirmed." }, { status: "CORRUPTED", details: "Missing ustar magic in TAR header block." });
+      }
+      case "xz":
+        return hdr(h.startsWith("fd377a585a00"), { status: "VALID", details: "Valid XZ signature." }, { status: "CORRUPTED", details: "Missing XZ magic bytes." });
+      case "zst": case "zstd":
+        return hdr(h.startsWith("28b52ffd"), { status: "VALID", details: "Valid Zstandard signature." }, { status: "CORRUPTED", details: "Missing Zstandard magic bytes." });
+      default:
+        return { status: "UNKNOWN", details: "Format not natively evaluated." };
+    }
+  }
+
+  function testImageUrlDecode(url, revokeAfter = false) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (revokeAfter) URL.revokeObjectURL(url);
+        resolve({ status: "VALID", details: "Passed header check and browser image decode." });
+      };
+      img.onerror = () => {
+        if (revokeAfter) URL.revokeObjectURL(url);
+        resolve({ status: "CORRUPTED", details: "Header valid, but image data fails to decode." });
+      };
+      img.src = url;
+    });
+  }
+
+  function testMediaUrlDecode(url, type, revokeAfter = false) {
+    return new Promise((resolve) => {
+      const mediaEl = type === "audio" ? el("bgAudio") : el("bgVideo");
+      let settled = false;
+      let timer = 0;
+      const onCanPlay = () => {
+        clearTimeout(timer);
+        done({ status: "VALID", details: "Passed header check and media stream decode." });
+      };
+      const onErr = () => {
+        clearTimeout(timer);
+        const code = mediaEl.error ? mediaEl.error.code : 0;
+        if (code === 3) {
+          done({ status: "CORRUPTED", details: "Decode error — media stream is corrupted." });
+        } else {
+          done({ status: "VALID", details: "Header valid; codec unsupported by browser." });
+        }
+      };
+      const done = (res) => {
+        if (settled) return;
+        settled = true;
+        mediaEl.removeEventListener("canplay", onCanPlay);
+        mediaEl.removeEventListener("error", onErr);
+        try { mediaEl.pause(); } catch (_) {}
+        try { mediaEl.removeAttribute("src"); mediaEl.load(); } catch (_) {}
+        if (revokeAfter) {
+          try { URL.revokeObjectURL(url); } catch (_) {}
+        }
+        resolve(res);
+      };
+      timer = setTimeout(() => {
+        done({ status: "VALID", details: "Header valid; background player timed out (codec may be unsupported)." });
+      }, 4500);
+      mediaEl.addEventListener("canplay", onCanPlay);
+      mediaEl.addEventListener("error", onErr);
+      mediaEl.src = url;
+      mediaEl.load();
+    });
+  }
+
+  function getFilteredRecords() {
+    const q = state.query.trim().toLowerCase();
+    const list = state.records.filter((r) => {
+      if (state.filter === "pass" && r.status !== "VALID") return false;
+      if (state.filter === "fail" && r.status !== "CORRUPTED") return false;
+      if (state.filter === "unknown" && r.status !== "UNKNOWN") return false;
+      if (q) {
+        const hay = `${r.name} ${r.ext} ${r.path} ${r.details}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const rank = { CORRUPTED: 0, UNKNOWN: 1, QUARANTINED: 2, VALID: 3 };
+    list.sort((a, b) => {
+      let c = 0;
+      if (state.sortKey === "size") c = a.size - b.size;
+      else if (state.sortKey === "status") c = (rank[a.status] ?? 9) - (rank[b.status] ?? 9);
+      else c = String(a[state.sortKey] || "").localeCompare(String(b[state.sortKey] || ""));
+      return c * state.sortDir;
+    });
+    return list;
+  }
+
+  function renderResultsTable() {
+    const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+    const body = el("resultsBody");
+    const chkAll = el("chkAllResults");
+    if (chkAll) chkAll.checked = false;
+    const rows = getFilteredRecords();
+    if (!rows.length) {
+      body.innerHTML = `<tr id="emptyRow"><td colspan="6" style="text-align:center;color:var(--muted);padding:28px;">${escapeHtml(t.empty)}</td></tr>`;
+      updateQuarantineButtonState();
+      return;
+    }
+
+    const cap = rows.slice(0, 1500);
+    body.innerHTML = cap.map((r) => {
+      const badgeCls = r.status === "VALID" ? "pass" : (r.status === "CORRUPTED" ? "fail" : (r.status === "QUARANTINED" ? "quarantined" : "unknown"));
+      const badgeTxt = r.status === "VALID" ? t.statValid : (r.status === "CORRUPTED" ? t.statFail : (r.status === "QUARANTINED" ? t.statQuarBadge : t.statUnk));
+      const checked = state.selectedScanKeys.has(r.key) ? "checked" : "";
+      const disabled = r.status === "QUARANTINED" ? "disabled" : "";
+      const safeKey = escapeHtml(r.key);
+      return `<tr data-key="${safeKey}">
+        <td><input type="checkbox" class="scan-chk" data-key="${safeKey}" ${checked} ${disabled}></td>
+        <td><strong>${escapeHtml(r.name)}</strong><span class="path-text">${escapeHtml(r.rel)}</span></td>
+        <td>.${escapeHtml(r.ext)}</td>
+        <td>${escapeHtml(formatSize(r.size))}</td>
+        <td><span class="badge ${badgeCls}">${escapeHtml(badgeTxt)}</span></td>
+        <td style="color:var(--muted);">${escapeHtml(translateDiag(r.details, state.lang))}</td>
+      </tr>`;
+    }).join("");
+    if (chkAll) {
+      const selectable = cap.filter((r) => r.status !== "QUARANTINED");
+      chkAll.checked = selectable.length > 0 && selectable.every((r) => state.selectedScanKeys.has(r.key));
+    }
+    updateQuarantineButtonState();
+  }
+
+  function updateQuarantineButtonState() {
+    el("btnQuarantineSelected").disabled = state.selectedScanKeys.size === 0;
+  }
+
+  function selectAllCorrupted() {
+    state.selectedScanKeys.clear();
+    state.records.forEach((r) => {
+      if (r.status === "CORRUPTED") state.selectedScanKeys.add(r.key);
+    });
+    renderResultsTable();
+  }
+
+  async function moveSelectedToQuarantine() {
+    const t = I18N[state.lang] || I18N.EN;
+    const keys = Array.from(state.selectedScanKeys);
+    if (!keys.length) return;
+    const byKey = new Map(state.records.map((r) => [r.key, r]));
+    const selectedRecs = keys.map((k) => byKey.get(k)).filter(Boolean);
+    const serverRecs = selectedRecs.filter((r) => r.source === "server");
+    const browserRecs = selectedRecs.filter((r) => r.source === "browser");
+
+    if (serverRecs.length > 0 && state.serverOnline && state.activeRoot && !isBlockedCPath(state.activeRoot)) {
+      const payload = {
+        root: state.activeRoot,
+        files: serverRecs.map((r) => ({ rel: r.rel, path: r.path, reason: r.details })),
+        remove_empty_folders: el("emptyFolderCheck").checked
+      };
+      try {
+        const res = await fetch(`${SERVER_ORIGIN}/api/deleter/quarantine`, {
+          method: "POST",
+          headers: apiHeaders(true),
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.message || data.error || "Quarantine failed", 3400);
+          return;
+        }
+        const movedSet = new Set((data.moved || []).map((m) => m.orig_rel));
+        state.records.forEach((r) => {
+          if (movedSet.has(r.rel)) {
+            r.status = "QUARANTINED";
+            r.details = "Moved to _OSIRIS_QUARANTINE";
+            state.selectedScanKeys.delete(r.key);
+          }
+        });
+        renderQuarantineData(data.quarantine);
+        updateScanProgressSummary();
+        renderResultsTable();
+        showToast(`Moved ${data.moved_count} file(s) to quarantine for manual review.`, 3200);
+      } catch (err) {
+        showToast("Quarantine error: " + String(err), 3400);
+      }
+      return;
+    }
+
+    if (browserRecs.length > 0 && state.dirHandle) {
+      let movedCount = 0;
+      const qRoot = await state.dirHandle.getDirectoryHandle("_OSIRIS_QUARANTINE", { create: true });
+      const usedNames = new Set();
+      for await (const [existingName] of qRoot.entries()) {
+        usedNames.add(existingName.toLowerCase());
+      }
+      for (const rec of browserRecs) {
+        if (!rec.handleInfo) continue;
+        try {
+          const buf = await rec.fileObj.arrayBuffer();
+          let dstName = rec.name;
+          if (usedNames.has(dstName.toLowerCase())) {
+            const dot = rec.name.lastIndexOf(".");
+            const stem = dot > 0 ? rec.name.slice(0, dot) : rec.name;
+            const extPart = dot > 0 ? rec.name.slice(dot) : "";
+            let n = 1;
+            while (usedNames.has(`${stem}_${n}${extPart}`.toLowerCase())) n++;
+            dstName = `${stem}_${n}${extPart}`;
+          }
+          usedNames.add(dstName.toLowerCase());
+          const newFh = await qRoot.getFileHandle(dstName, { create: true });
+          const wr = await newFh.createWritable();
+          await wr.write(buf);
+          await wr.close();
+          await rec.handleInfo.parentHandle.removeEntry(rec.name);
+          rec.status = "QUARANTINED";
+          rec.details = "Moved to _OSIRIS_QUARANTINE";
+          state.selectedScanKeys.delete(rec.key);
+          movedCount++;
+        } catch (_) {}
+      }
+      updateScanProgressSummary();
+      renderResultsTable();
+      showToast(`Moved ${movedCount} local file(s) to _OSIRIS_QUARANTINE.`, 3200);
+      return;
+    }
+
+    if (isBlockedCPath(state.activeRoot)) {
+      showToast(t.cBlockedToast, 3400);
+    } else {
+      showToast("Connect to local backend or use Chromium Browse Folder with write access to move files into quarantine.", 3800);
+    }
+  }
+
+  async function loadQuarantineList(rootPath) {
+    if (!state.serverOnline || !rootPath || isBlockedCPath(rootPath)) return;
+    try {
+      const res = await fetch(`${SERVER_ORIGIN}/api/deleter/quarantine?root=${encodeURIComponent(rootPath)}`, {
+        headers: apiHeaders(false),
+        cache: "no-store"
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      renderQuarantineData(data);
+    } catch (_) {}
+  }
+
+  function renderQuarantineData(qData) {
+    if (!qData) return;
+    state.quarantineItems = Array.isArray(qData.items) ? qData.items : [];
+    state.selectedQuarKeys.clear();
+    el("quarantinePathText").textContent = qData.quarantine_dir || "--";
+    el("cntQuar").textContent = String(state.quarantineItems.length);
+    renderQuarantineTable();
+  }
+
+  function renderQuarantineTable() {
+    const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+    const body = el("quarantineBody");
+    const chkAllQ = el("chkAllQuarantine");
+    if (chkAllQ) chkAllQ.checked = false;
+    const items = state.quarantineItems;
+    el("btnPurgeAll").disabled = items.length === 0;
+    if (!items.length) {
+      body.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">${escapeHtml(t.quarEmpty)}</td></tr>`;
+      updateQuarantineActionButtons();
+      return;
+    }
+    body.innerHTML = items.map((it) => {
+      const safeRel = escapeHtml(it.q_rel);
+      const checked = state.selectedQuarKeys.has(it.q_rel) ? "checked" : "";
+      return `<tr>
+        <td><input type="checkbox" class="quar-chk" data-qrel="${safeRel}" ${checked}></td>
+        <td><strong>${escapeHtml(it.name)}</strong><span class="path-text">${escapeHtml(it.quarantined_at)}</span></td>
+        <td class="path-text" style="display:table-cell;vertical-align:middle;">${escapeHtml(it.orig_rel)}</td>
+        <td>${escapeHtml(formatSize(it.size))}</td>
+        <td style="color:var(--muted);">${escapeHtml(translateDiag(it.reason, state.lang))}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn mini-btn" data-qact="preview" data-qrel="${safeRel}">${escapeHtml(t.previewBtn)}</button>
+            <button class="btn mini-btn" data-qact="explorer" data-qrel="${safeRel}">${escapeHtml(t.revealBtn)}</button>
+            <button class="btn mini-btn btn-green" data-qact="restore" data-qrel="${safeRel}">${escapeHtml(t.restoreBtn)}</button>
+            <button class="btn mini-btn btn-danger" data-qact="purge" data-qrel="${safeRel}">${escapeHtml(t.delPermBtn)}</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join("");
+    if (chkAllQ) {
+      chkAllQ.checked = items.length > 0 && items.every((it) => state.selectedQuarKeys.has(it.q_rel));
+    }
+    updateQuarantineActionButtons();
+  }
+
+  function updateQuarantineActionButtons() {
+    const hasSel = state.selectedQuarKeys.size > 0;
+    el("btnRestoreSelected").disabled = !hasSel;
+    el("btnPurgeSelected").disabled = !hasSel;
+    el("btnPurgeAll").disabled = state.quarantineItems.length === 0;
+  }
+
+  async function restoreQuarantineItems(qRels) {
+    if (!state.serverOnline || !state.activeRoot || !qRels.length) return;
+    try {
+      const res = await fetch(`${SERVER_ORIGIN}/api/deleter/restore`, {
+        method: "POST",
+        headers: apiHeaders(true),
+        body: JSON.stringify({ root: state.activeRoot, items: qRels })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.message || data.error || "Restore failed", 3200);
+        return;
+      }
+      renderQuarantineData(data.quarantine);
+      showToast(`Restored ${data.restored_count} file(s) to original path.`, 2800);
+    } catch (err) {
+      showToast("Restore error: " + String(err), 3200);
+    }
+  }
+
+  async function purgeQuarantineItems(qRels, purgeAll = false) {
+    if (!state.serverOnline || !state.activeRoot) return;
+    try {
+      const res = await fetch(`${SERVER_ORIGIN}/api/deleter/purge`, {
+        method: "POST",
+        headers: apiHeaders(true),
+        body: JSON.stringify({ root: state.activeRoot, items: qRels, all: purgeAll })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.message || data.error || "Deletion failed", 3200);
+        return;
+      }
+      renderQuarantineData(data.quarantine);
+      showToast(`Permanently deleted ${data.deleted_count} file(s) from quarantine.`, 2800);
+    } catch (err) {
+      showToast("Deletion error: " + String(err), 3200);
+    }
+  }
+
+  function openConfirmDialog(title, bodyText, onConfirm) {
+    el("confirmTitle").textContent = title;
+    el("confirmBody").textContent = bodyText;
+    state.pendingConfirmAction = onConfirm;
+    el("confirmModal").classList.add("open");
+  }
+
+  async function openExplorerLocation(pathStr) {
+    if (!state.serverOnline || !pathStr) return;
+    try {
+      await fetch(`${SERVER_ORIGIN}/api/open-location`, {
+        method: "POST",
+        headers: apiHeaders(true),
+        body: JSON.stringify({ path: pathStr })
+      });
+    } catch (_) {}
+  }
+
+  function wireEvents() {
+    const langOrder = ["FR", "DE", "EN"];
+    if (el("btnLangToggle")) {
+      el("btnLangToggle").addEventListener("click", () => {
+        const cur = normalizeLang(state.lang);
+        const idx = langOrder.indexOf(cur);
+        state.lang = langOrder[(idx === -1 ? 0 : idx + 1) % langOrder.length];
+        syncSettingsStorage(state.lang, state.theme);
+        applyThemeAndLang();
+      });
+    }
+    window.addEventListener("storage", (e) => {
+      if (e.key === "files_indexation_settings_v1" || e.key === "osiris_lang" || e.key === "osiris_theme") {
+        loadInitialSettings();
+      }
+    });
+
+    el("themeToggle").addEventListener("click", () => {
+      state.theme = state.theme === "dark" ? "light" : "dark";
+      syncSettingsStorage(state.lang, state.theme);
+      applyThemeAndLang();
+    });
+
+    el("btnBackIndexer").addEventListener("click", () => {
+      if (state.serverOnline || location.protocol === "http:" || location.protocol === "https:") {
+        location.href = `${SERVER_ORIGIN}/`;
+      } else {
+        location.href = "../FILES_INDEXATION_SYSTEM.html";
+      }
+    });
+
+    el("btnInstallSuite").addEventListener("click", async () => {
+      if (!state.serverOnline) {
+        showToast("Start Osiris_Indexer_Deleter.exe or files_indexer.py first to create Windows Desktop shortcuts.", 3400);
+        return;
+      }
+      try {
+        const res = await fetch(`${SERVER_ORIGIN}/api/deleter/install`, {
+          method: "POST",
+          headers: apiHeaders(true),
+          body: JSON.stringify({ start_menu: true })
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          showToast(`Desktop & Start Menu shortcuts installed (${(data.created || []).length} links).`, 3400);
+        } else {
+          showToast(data.error || "Shortcut installation failed.", 3400);
+        }
+      } catch (err) {
+        showToast("Shortcut installation error: " + String(err), 3400);
+      }
+    });
+
+    el("driveSelect").addEventListener("change", (e) => {
+      el("rootInput").value = e.target.value;
+      state.activeRoot = e.target.value;
+      loadQuarantineList(e.target.value);
+    });
+
+    el("btnServerScan").addEventListener("click", runServerScan);
+    el("folderBtn").addEventListener("click", (e) => { e.stopPropagation(); browseFolderLocal(); });
+    el("btnPickFiles").addEventListener("click", (e) => { e.stopPropagation(); el("fileInput").click(); });
+
+    const dz = el("dropZone");
+    dz.addEventListener("click", (e) => {
+      if (e.target.closest(".checkbox-group, input, label, button")) return;
+      el("fileInput").click();
+    });
+    dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("drag-active"); });
+    dz.addEventListener("dragleave", () => dz.classList.remove("drag-active"));
+    dz.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      dz.classList.remove("drag-active");
+      await handleDroppedTransfer(e.dataTransfer);
+    });
+
+    el("fileInput").addEventListener("change", (e) => {
+      handleLocalFiles(e.target.files);
+      e.target.value = "";
+    });
+    el("folderInput").addEventListener("change", (e) => {
+      handleLocalFiles(e.target.files);
+      e.target.value = "";
+    });
+
+    el("filterBtns").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-filter]");
+      if (!btn) return;
+      state.filter = btn.getAttribute("data-filter");
+      document.querySelectorAll("#filterBtns [data-filter]").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderResultsTable();
+    });
+
+    el("searchInput").addEventListener("input", (e) => {
+      state.query = e.target.value;
+      renderResultsTable();
+    });
+
+    document.querySelectorAll("thead th[data-sort]").forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.getAttribute("data-sort");
+        if (state.sortKey === key) state.sortDir *= -1;
+        else { state.sortKey = key; state.sortDir = 1; }
+        renderResultsTable();
+      });
+    });
+
+    el("btnSelectCorrupted").addEventListener("click", selectAllCorrupted);
+    el("btnQuarantineSelected").addEventListener("click", moveSelectedToQuarantine);
+
+    el("chkAllResults").addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll(".scan-chk:not(:disabled)").forEach((chk) => {
+        const k = chk.getAttribute("data-key");
+        chk.checked = checked;
+        if (checked) state.selectedScanKeys.add(k);
+        else state.selectedScanKeys.delete(k);
+      });
+      updateQuarantineButtonState();
+    });
+
+    el("resultsBody").addEventListener("change", (e) => {
+      const chk = e.target.closest(".scan-chk");
+      if (!chk) return;
+      const k = chk.getAttribute("data-key");
+      if (chk.checked) state.selectedScanKeys.add(k);
+      else state.selectedScanKeys.delete(k);
+      updateQuarantineButtonState();
+    });
+
+    el("btnOpenQuarantineFolder").addEventListener("click", () => {
+      const qDir = el("quarantinePathText").textContent;
+      if (qDir && qDir !== "--") openExplorerLocation(qDir);
+    });
+
+    el("btnRefreshQuarantine").addEventListener("click", () => loadQuarantineList(state.activeRoot));
+
+    el("chkAllQuarantine").addEventListener("change", (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll(".quar-chk").forEach((chk) => {
+        const k = chk.getAttribute("data-qrel");
+        chk.checked = checked;
+        if (checked) state.selectedQuarKeys.add(k);
+        else state.selectedQuarKeys.delete(k);
+      });
+      updateQuarantineActionButtons();
+    });
+
+    el("quarantineBody").addEventListener("change", (e) => {
+      const chk = e.target.closest(".quar-chk");
+      if (!chk) return;
+      const k = chk.getAttribute("data-qrel");
+      if (chk.checked) state.selectedQuarKeys.add(k);
+      else state.selectedQuarKeys.delete(k);
+      updateQuarantineActionButtons();
+    });
+
+    el("quarantineBody").addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-qact]");
+      if (!btn) return;
+      const act = btn.getAttribute("data-qact");
+      const qRel = btn.getAttribute("data-qrel");
+      const item = state.quarantineItems.find((x) => x.q_rel === qRel);
+      if (!item) return;
+      if (act === "explorer") {
+        openExplorerLocation(item.q_abs);
+      } else if (act === "preview") {
+        window.open(`${SERVER_ORIGIN}/api/file?path=${encodeURIComponent(item.q_abs)}`, "_blank", "noopener,noreferrer");
+      } else if (act === "restore") {
+        restoreQuarantineItems([qRel]);
+      } else if (act === "purge") {
+        const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+        openConfirmDialog(
+          t.permDelTitle,
+          t.confirmSingleDel(item.name),
+          () => purgeQuarantineItems([qRel], false)
+        );
+      }
+    });
+
+    el("btnRestoreSelected").addEventListener("click", () => restoreQuarantineItems(Array.from(state.selectedQuarKeys)));
+    el("btnPurgeSelected").addEventListener("click", () => {
+      const list = Array.from(state.selectedQuarKeys);
+      if (!list.length) return;
+      const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+      openConfirmDialog(
+        t.permDelTitle,
+        t.confirmMultiDel(list.length),
+        () => purgeQuarantineItems(list, false)
+      );
+    });
+    el("btnPurgeAll").addEventListener("click", () => {
+      if (!state.quarantineItems.length) return;
+      const t = I18N[normalizeLang(state.lang)] || I18N.EN;
+      openConfirmDialog(
+        t.emptyQuarTitle,
+        t.confirmAllDel(state.quarantineItems.length),
+        () => purgeQuarantineItems([], true)
+      );
+    });
+
+    const closeConfirm = () => {
+      state.pendingConfirmAction = null;
+      el("confirmModal").classList.remove("open");
+    };
+    el("confirmCancel").addEventListener("click", closeConfirm);
+    el("confirmModal").addEventListener("click", (e) => {
+      if (e.target === el("confirmModal")) closeConfirm();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && el("confirmModal").classList.contains("open")) {
+        closeConfirm();
+      }
+    });
+    el("confirmOk").addEventListener("click", async () => {
+      const fn = state.pendingConfirmAction;
+      state.pendingConfirmAction = null;
+      el("confirmModal").classList.remove("open");
+      if (fn) await fn();
+    });
+
+    window.addEventListener("scroll", () => {
+      const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      el("scrollToTopBtn").classList.toggle("show", y > 260);
+    }, { passive: true });
+    el("scrollToTopBtn").addEventListener("click", () => {
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { window.scrollTo(0, 0); }
+    });
+  }
+
+  startSessionHeartbeat();
+  loadInitialSettings();
+  wireEvents();
+  detectBackend();
+})();
+</script>
+</body>
+</html>
